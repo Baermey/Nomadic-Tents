@@ -18,6 +18,7 @@ import net.minecraft.world.level.biome.BiomeManager;
 import net.minecraft.world.level.border.BorderChangeListener;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.WorldGenSettings;
+import net.minecraft.world.level.levelgen.WorldOptions;
 import net.minecraft.world.level.storage.DerivedLevelData;
 import net.minecraft.world.level.storage.LevelStorageSource.LevelStorageAccess;
 import net.minecraft.world.level.storage.WorldData;
@@ -184,6 +185,7 @@ public class DynamicDimensionHelper {
 
         final WorldData worldData = server.getWorldData();
         final WorldGenSettings worldGenSettings = worldData.worldGenSettings();
+        final WorldOptions worldGenOptions = worldData.worldGenOptions();
         final DerivedLevelData derivedLevelData = new DerivedLevelData(worldData, worldData.overworldData());
         // now we have everything we need to create the dimension and the level
         // this is the same order server init creates levels:
@@ -208,7 +210,7 @@ public class DynamicDimensionHelper {
                 dimension,
                 chunkListener,
                 worldGenSettings.isDebug(),
-                BiomeManager.obfuscateSeed(worldGenSettings.seed()),
+                BiomeManager.obfuscateSeed(worldGenOptions.seed()),
                 ImmutableList.of(),
                 false   // "tick time", true for overworld, always false for everything else
         );

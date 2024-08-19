@@ -201,7 +201,7 @@ public class TentItem extends Item {
             return;
         }
         // locate selected block
-        BlockHitResult result = clipFrom(entity, entity.getAttribute(ForgeMod.REACH_DISTANCE.get()).getValue());
+        BlockHitResult result = clipFrom(entity, entity.getAttribute(ForgeMod.BLOCK_REACH.get()).getValue());
         if (result.getType() != HitResult.Type.BLOCK) {
             entity.releaseUsingItem();
             return;
