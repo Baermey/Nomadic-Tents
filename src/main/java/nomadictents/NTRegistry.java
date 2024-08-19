@@ -249,7 +249,7 @@ public final class NTRegistry {
     private void buildContents(BuildCreativeModeTabContentsEvent event) {
         if (event.getTabKey() == TAB.getKey()) {
             ITEMS.getEntries().stream().map(RegistryObject::get).forEach(event::accept);
-            BLOCKS.getEntries().stream().filter(block -> block.get().getName().toString().endsWith("_frame")).map(RegistryObject::get).forEach(event::accept);
+            BLOCKS.getEntries().stream().filter(block -> !block.get().getName().toString().endsWith("_frame")).map(RegistryObject::get).forEach(event::accept);
         }
     }
 }
