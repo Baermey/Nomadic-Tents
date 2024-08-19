@@ -22,7 +22,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.LayeredCauldronBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
@@ -141,8 +140,8 @@ public class TentItem extends Item {
                 placePos = placePos.relative(context.getClickedFace());
             }
             // determine if placement position is valid
-            BlockState replace = context.getLevel().getBlockState(placePos);
-            if (replace.getMaterial() != Material.AIR && !replace.getMaterial().isLiquid()) {
+            BlockState placeBlockState = context.getLevel().getBlockState(placePos);
+            if (placeBlockState.canBeReplaced()) {
                 return InteractionResult.FAIL;
             }
             if (canPlaceTent(context.getLevel(), placePos, context.getHorizontalDirection())) {
@@ -322,6 +321,6 @@ public class TentItem extends Item {
         float cosPitch = -Mth.cos(pitch);
         float sinPitch = Mth.sin(pitch);
         final Vec3 endVec = startVec.add(sinYaw * cosPitch * range, sinPitch * range, cosYaw * cosPitch * range);
-        return player.level.clip(new ClipContext(startVec, endVec, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, player));
+        return player.level().clip(new ClipContext(startVec, endVec, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, player));
     }
 }

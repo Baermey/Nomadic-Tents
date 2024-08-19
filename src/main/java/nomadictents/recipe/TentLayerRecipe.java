@@ -2,6 +2,7 @@ package nomadictents.recipe;
 
 import com.google.gson.JsonObject;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -80,7 +81,7 @@ public class TentLayerRecipe extends ShapedRecipe {
             if (json.has("layer")) {
                 bLayer = json.get("layer").getAsByte();
             }
-            return new TentLayerRecipe(recipeId, recipe.getResultItem(), bLayer,
+            return new TentLayerRecipe(recipeId, recipe.getResultItem(RegistryAccess.EMPTY), bLayer,
                     recipe.getWidth(), recipe.getHeight(), recipe.getIngredients());
         }
 
@@ -88,7 +89,7 @@ public class TentLayerRecipe extends ShapedRecipe {
         public ShapedRecipe fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer) {
             ShapedRecipe recipe = super.fromNetwork(recipeId, buffer);
             byte layer = buffer.readByte();
-            return new TentLayerRecipe(recipeId, recipe.getResultItem(), layer,
+            return new TentLayerRecipe(recipeId, recipe.getResultItem(RegistryAccess.EMPTY), layer,
                     recipe.getWidth(), recipe.getHeight(), recipe.getIngredients());
         }
 

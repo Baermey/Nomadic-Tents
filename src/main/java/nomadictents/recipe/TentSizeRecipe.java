@@ -2,6 +2,7 @@ package nomadictents.recipe;
 
 import com.google.gson.JsonObject;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -67,7 +68,7 @@ public class TentSizeRecipe extends ShapedRecipe {
         public ShapedRecipe fromJson(ResourceLocation recipeId, JsonObject json) {
             // read the recipe from shapeless recipe serializer
             final ShapedRecipe recipe = super.fromJson(recipeId, json);
-            return new TentSizeRecipe(recipeId, recipe.getResultItem(),
+            return new TentSizeRecipe(recipeId, recipe.getResultItem(RegistryAccess.EMPTY),
                     recipe.getWidth(), recipe.getHeight(), recipe.getIngredients());
         }
 

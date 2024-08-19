@@ -5,6 +5,7 @@ import com.mojang.serialization.Lifecycle;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.WritableRegistry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -56,7 +57,7 @@ public class DynamicDimensionHelper {
         // ensure destination chunk is loaded before we put the player in it
         targetWorld.getChunk(targetPos);
         // place tent at location
-        TentPlacer.getInstance().placeOrUpgradeTent(targetWorld, targetPos, tent, (ServerLevel) entity.level, entity.position(), entity.getYRot());
+        TentPlacer.getInstance().placeOrUpgradeTent(targetWorld, targetPos, tent, (ServerLevel) entity.level(), entity.position(), entity.getYRot());
         // teleport the entity
         sendToDimension(entity, targetWorld, targetVec, targetRot);
     }
@@ -73,7 +74,7 @@ public class DynamicDimensionHelper {
         // add 180 degrees to target rotation
         targetRot = Mth.wrapDegrees(targetRot + 180.0F);
         // ensure destination chunk is loaded before we put the player in it
-        targetWorld.getChunk(new BlockPos(targetVec));
+        targetWorld.getChunk(new BlockPos((int) targetVec.x, (int) targetVec.y, (int) targetVec.z)); // TODO: probably a better way to do this
         // teleport the entity
         sendToDimension(entity, targetWorld, targetVec, targetRot);
     }
@@ -89,7 +90,7 @@ public class DynamicDimensionHelper {
      */
     private static void sendToDimension(Entity entity, ServerLevel targetWorld, Vec3 targetVec, float targetRot) {
         // ensure destination chunk is loaded before we put the player in it
-        targetWorld.getChunk(new BlockPos(targetVec));
+        targetWorld.getChunk(new BlockPos((int) targetVec.x, (int) targetVec.y, (int) targetVec.z));
         // teleport the entity
         ITeleporter teleporter = DirectTeleporter.create(entity, targetVec, targetRot, TentPlacer.TENT_DIRECTION);
         entity.changeDimension(targetWorld, teleporter);
@@ -169,7 +170,7 @@ public class DynamicDimensionHelper {
                                                                   BiFunction<MinecraftServer, ResourceKey<LevelStem>, LevelStem> dimensionFactory) {
 
         ServerLevel overworld = server.getLevel(Level.OVERWORLD);
-        ResourceKey<LevelStem> dimensionKey = ResourceKey.create(Registry.LEVEL_STEM_REGISTRY, worldKey.location());
+        ResourceKey<LevelStem> dimensionKey = ResourceKey.create(Registries.LEVEL_STEM, worldKey.location());
         LevelStem dimension = dimensionFactory.apply(server, dimensionKey);
 
         // we need to get some private fields from MinecraftServer here

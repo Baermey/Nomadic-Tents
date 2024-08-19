@@ -1,6 +1,7 @@
 package nomadictents;
 
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
@@ -14,8 +15,10 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorType;
-import net.minecraft.world.level.material.Material;
-import net.minecraft.world.level.material.MaterialColor;
+import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.level.material.PushReaction;
+import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
@@ -45,6 +48,7 @@ import nomadictents.tileentity.TentDoorBlockEntity;
 import nomadictents.util.TentSize;
 import nomadictents.util.TentType;
 
+import javax.swing.*;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -58,13 +62,7 @@ public final class NTRegistry {
     private static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, NomadicTents.MODID);
     private static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, NomadicTents.MODID);
     private static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS = DeferredRegister.create(ForgeRegistries.RECIPE_SERIALIZERS, NomadicTents.MODID);
-
-    public static final CreativeModeTab TAB = new CreativeModeTab(MODID) {
-        @Override
-        public ItemStack makeIcon() {
-            return new ItemStack(TINY_YURT.get());
-        }
-    };
+    private static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, NomadicTents.MODID);
 
     public static void register() {
         // deferred registers
@@ -84,20 +82,20 @@ public final class NTRegistry {
         // register tepee blocks
         for (final TepeeBlock.Type type : TepeeBlock.Type.values()) {
             BLOCKS.register(type.getSerializedName() + "_tepee_wall", () ->
-                    new TepeeBlock(type, BlockBehaviour.Properties.of(Material.BARRIER, MaterialColor.TERRACOTTA_WHITE)
+                    new TepeeBlock(type, BlockBehaviour.Properties.of().mapColor(MapColor.TERRACOTTA_WHITE).pushReaction(PushReaction.BLOCK)
                             .sound(SoundType.WOOL)));
         }
         // register shamiyana blocks
         for (DyeColor color : DyeColor.values()) {
             BLOCKS.register(color.getSerializedName() + "_shamiyana_wall", () ->
-                    new ShamiyanaWallBlock(color, BlockBehaviour.Properties.of(Material.BARRIER, color.getMaterialColor())
+                    new ShamiyanaWallBlock(color, BlockBehaviour.Properties.of().mapColor(color.getMapColor()).pushReaction(PushReaction.BLOCK)
                             .sound(SoundType.WOOL)));
         }
         // register door blocks
         for (TentType type : TentType.values()) {
             for (TentSize width : TentSize.values()) {
                 BLOCKS.register(width.getSerializedName() + "_" + type.getSerializedName() + "_door", () ->
-                        new TentDoorBlock(BlockBehaviour.Properties.of(Material.BARRIER, MaterialColor.WOOL)
+                        new TentDoorBlock(BlockBehaviour.Properties.of().mapColor(MapColor.WOOL).pushReaction(PushReaction.BLOCK)
                                 .sound(SoundType.WOOL)));
             }
         }
@@ -108,24 +106,24 @@ public final class NTRegistry {
         for (TentType type : TentType.values()) {
             for (TentSize width : TentSize.values()) {
                 ITEMS.register(width.getSerializedName() + "_" + type.getSerializedName(), () ->
-                        new TentItem(type, width, new Item.Properties().tab(TAB).stacksTo(1)));
+                        new TentItem(type, width, new Item.Properties().stacksTo(1)));
             }
         }
         // register crafting items
-        ITEMS.register("tent_canvas", () -> new Item(new Item.Properties().tab(TAB)));
-        ITEMS.register("yurt_section", () -> new Item(new Item.Properties().tab(TAB)));
-        ITEMS.register("tepee_section", () -> new Item(new Item.Properties().tab(TAB)));
-        ITEMS.register("indlu_section", () -> new Item(new Item.Properties().tab(TAB)));
-        ITEMS.register("bedouin_section", () -> new Item(new Item.Properties().tab(TAB)));
-        ITEMS.register("shamiyana_section", () -> new Item(new Item.Properties().tab(TAB)));
-        ITEMS.register("golden_crossbeams", () -> new Item(new Item.Properties().tab(TAB)));
-        ITEMS.register("obsidian_crossbeams", () -> new Item(new Item.Properties().tab(TAB)));
-        ITEMS.register("diamond_crossbeams", () -> new Item(new Item.Properties().tab(TAB)));
-        ITEMS.register("stone_tent_shovel", () -> new TentShovelItem(new Item.Properties().tab(TAB)));
-        ITEMS.register("iron_tent_shovel", () -> new TentShovelItem(new Item.Properties().tab(TAB)));
-        ITEMS.register("golden_tent_shovel", () -> new TentShovelItem(new Item.Properties().tab(TAB)));
-        ITEMS.register("obsidian_tent_shovel", () -> new TentShovelItem(new Item.Properties().tab(TAB)));
-        ITEMS.register("diamond_tent_shovel", () -> new TentShovelItem(new Item.Properties().tab(TAB)));
+        ITEMS.register("tent_canvas", () -> new Item(new Item.Properties()));
+        ITEMS.register("yurt_section", () -> new Item(new Item.Properties()));
+        ITEMS.register("tepee_section", () -> new Item(new Item.Properties()));
+        ITEMS.register("indlu_section", () -> new Item(new Item.Properties()));
+        ITEMS.register("bedouin_section", () -> new Item(new Item.Properties()));
+        ITEMS.register("shamiyana_section", () -> new Item(new Item.Properties()));
+        ITEMS.register("golden_crossbeams", () -> new Item(new Item.Properties()));
+        ITEMS.register("obsidian_crossbeams", () -> new Item(new Item.Properties()));
+        ITEMS.register("diamond_crossbeams", () -> new Item(new Item.Properties()));
+        ITEMS.register("stone_tent_shovel", () -> new TentShovelItem(new Item.Properties()));
+        ITEMS.register("iron_tent_shovel", () -> new TentShovelItem(new Item.Properties()));
+        ITEMS.register("golden_tent_shovel", () -> new TentShovelItem(new Item.Properties()));
+        ITEMS.register("obsidian_tent_shovel", () -> new TentShovelItem(new Item.Properties()));
+        ITEMS.register("diamond_tent_shovel", () -> new TentShovelItem(new Item.Properties()));
 
         // register item blocks
         registerItemBlock("rigid_dirt", RIGID_DIRT);
@@ -144,32 +142,32 @@ public final class NTRegistry {
             registerItemBlock(entry.getKey().getSerializedName() + "_shamiyana_wall", entry.getValue());
         }
         // register wall/roof frames
-        registerItemBlock("door_frame", DOOR_FRAME, false);
+        registerItemBlock("door_frame", DOOR_FRAME);
         for (RegistryObject<Block> supplier : TentPlacer.BLOCK_TO_FRAME.values()) {
-            registerItemBlock(supplier.getId().getPath(), supplier, false);
+            registerItemBlock(supplier.getId().getPath(), supplier);
         }
     }
 
     //// BLOCKS ////
     public static final RegistryObject<Block> YURT_WALL = BLOCKS.register("yurt_wall", () ->
-            new YurtWallBlock(BlockBehaviour.Properties.of(Material.BARRIER, MaterialColor.WOOL)
+            new YurtWallBlock(BlockBehaviour.Properties.of().mapColor(MapColor.WOOL).pushReaction(PushReaction.BLOCK)
                     .sound(SoundType.WOOL)));
     public static final RegistryObject<Block> YURT_ROOF = BLOCKS.register("yurt_roof", () ->
-            new YurtRoofBlock(BlockBehaviour.Properties.of(Material.BARRIER, MaterialColor.COLOR_LIGHT_BLUE)
+            new YurtRoofBlock(BlockBehaviour.Properties.of().mapColor(DyeColor.LIGHT_BLUE).pushReaction(PushReaction.BLOCK)
                     .sound(SoundType.WOOL)));
     public static final RegistryObject<Block> BEDOUIN_WALL = BLOCKS.register("bedouin_wall", () ->
-            new QuarterTentBlock(BlockBehaviour.Properties.of(Material.BARRIER, MaterialColor.COLOR_BROWN)
+            new QuarterTentBlock(BlockBehaviour.Properties.of().mapColor(DyeColor.BROWN).pushReaction(PushReaction.BLOCK)
                     .sound(SoundType.WOOL)));
     public static final RegistryObject<Block> BEDOUIN_ROOF = BLOCKS.register("bedouin_roof", () ->
-            new TentBlock(BlockBehaviour.Properties.of(Material.BARRIER, MaterialColor.COLOR_BROWN)
+            new TentBlock(BlockBehaviour.Properties.of().mapColor(DyeColor.BROWN).pushReaction(PushReaction.BLOCK)
                     .sound(SoundType.WOOL)));
     public static final RegistryObject<Block> INDLU_WALL = BLOCKS.register("indlu_wall", () ->
-            new IndluWallBlock(BlockBehaviour.Properties.of(Material.BARRIER, MaterialColor.GRASS)
+            new IndluWallBlock(BlockBehaviour.Properties.of().mapColor(MapColor.GRASS).pushReaction(PushReaction.BLOCK)
                     .noOcclusion()
                     .isViewBlocking((b, r, p) -> false)
                     .sound(SoundType.GRASS)));
     public static final RegistryObject<Block> RIGID_DIRT = BLOCKS.register("rigid_dirt", () ->
-            new TentBlock(BlockBehaviour.Properties.of(Material.BARRIER, MaterialColor.DIRT)
+            new TentBlock(BlockBehaviour.Properties.of().mapColor(MapColor.DIRT).pushReaction(PushReaction.BLOCK)
                     .sound(SoundType.GRAVEL)));
     public static final RegistryObject<Block> DOOR_FRAME = registerFrame("door_frame");
     public static final RegistryObject<Block> YURT_WALL_FRAME = registerFrame("yurt_wall_frame");
@@ -182,8 +180,8 @@ public final class NTRegistry {
     public static final RegistryObject<Block> BLANK_TEPEE_WALL = RegistryObject.create(new ResourceLocation(MODID, "blank_tepee_wall"), ForgeRegistries.BLOCKS);
     public static final RegistryObject<Block> WHITE_SHAMIYANA_WALL = RegistryObject.create(new ResourceLocation(MODID, "white_shamiyana_wall"), ForgeRegistries.BLOCKS);
     //// ITEMS ////
-    public static final RegistryObject<Item> MALLET = ITEMS.register("mallet", () -> new MalletItem(Tiers.IRON, false, new Item.Properties().tab(TAB)));
-    public static final RegistryObject<Item> GOLDEN_MALLET = ITEMS.register("golden_mallet", () -> new MalletItem(Tiers.DIAMOND, true, new Item.Properties().tab(TAB)));
+    public static final RegistryObject<Item> MALLET = ITEMS.register("mallet", () -> new MalletItem(Tiers.IRON, false, new Item.Properties()));
+    public static final RegistryObject<Item> GOLDEN_MALLET = ITEMS.register("golden_mallet", () -> new MalletItem(Tiers.DIAMOND, true, new Item.Properties()));
     public static final RegistryObject<Item> TINY_YURT = RegistryObject.create(new ResourceLocation(MODID, "tiny_yurt"), ForgeRegistries.ITEMS);
 
     //// BLOCK ENTITIES ////
@@ -208,6 +206,10 @@ public final class NTRegistry {
     public static final RegistryObject<TentColorRecipe.Serializer> TENT_COLOR_RECIPE_SERIALIZER = RECIPE_SERIALIZERS.register(
             TentColorRecipe.Serializer.CATEGORY, () -> new TentColorRecipe.Serializer());
 
+    //// CREATIVE TAB ////
+    public static final RegistryObject<CreativeModeTab> TAB = TABS.register("nomadic_tents", () -> new CreativeModeTab(CreativeModeTab.builder().icon(() -> new ItemStack(TINY_YURT.get()))) {
+    });
+
     //// PROCESSORS ////
     public static StructureProcessorType<TepeeStructureProcessor> TEPEE_PROCESSOR;
     public static StructureProcessorType<ShamiyanaStructureProcessor> SHAMIYANA_PROCESSOR;
@@ -223,30 +225,32 @@ public final class NTRegistry {
         LOC_PROCESSOR = StructureProcessorType.register(MODID + ":loc_processor", LocStructureProcessor.CODEC);
         // register chunk generator
         event.enqueueWork(() -> {
-            Registry.register(Registry.CHUNK_GENERATOR, new ResourceLocation(MODID, "empty"), EmptyChunkGenerator.CODEC);
+//            Registry.register(Registries.CHUNK_GENERATOR, new ResourceLocation(MODID, "empty"), EmptyChunkGenerator.CODEC);
+            Registry.register(Registries.CHUNK_GENERATOR, new ResourceLocation(MODID, "empty"), EmptyChunkGenerator.CODEC);
         });
     }
 
     private static RegistryObject<Block> registerFrame(final String name) {
         return BLOCKS.register(name, () ->
-                new FrameBlock(BlockBehaviour.Properties.of(Material.BARRIER, MaterialColor.WOOD)
+                new FrameBlock(BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).pushReaction(PushReaction.BLOCK)
                         .strength(-1.0F, 3600000.8F)
                         .noCollission().noLootTable().sound(SoundType.WOOD)));
     }
 
     private static RegistryObject<BlockItem> registerItemBlock(final String name, final Supplier<? extends Block> blockSupplier) {
-        return registerItemBlock(name, blockSupplier, true);
+        return ITEMS.register(name, itemBlock(blockSupplier));
     }
 
-    private static RegistryObject<BlockItem> registerItemBlock(final String name, final Supplier<? extends Block> blockSupplier, final boolean group) {
-        return ITEMS.register(name, itemBlock(blockSupplier, group));
-    }
-
-    private static Supplier<BlockItem> itemBlock(final Supplier<? extends Block> blockSupplier, final boolean group) {
+    private static Supplier<BlockItem> itemBlock(final Supplier<? extends Block> blockSupplier) {
         final Item.Properties props = new Item.Properties();
-        if (group) {
-            props.tab(TAB);
-        }
         return () -> new BlockItem(blockSupplier.get(), props);
+    }
+
+    @SubscribeEvent
+    private void buildContents(BuildCreativeModeTabContentsEvent event) {
+        if (event.getTabKey() == TAB.getKey()) {
+            ITEMS.getEntries().stream().map(RegistryObject::get).forEach(event::accept);
+            BLOCKS.getEntries().stream().filter(block -> block.get().getName().toString().endsWith("_frame")).map(RegistryObject::get).forEach(event::accept);
+        }
     }
 }

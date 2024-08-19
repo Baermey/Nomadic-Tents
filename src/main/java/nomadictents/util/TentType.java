@@ -4,6 +4,8 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import net.minecraft.util.StringRepresentable;
 
+import java.util.function.Supplier;
+
 public enum TentType implements StringRepresentable {
     YURT("yurt"),
     TEPEE("tepee"),
@@ -25,7 +27,7 @@ public enum TentType implements StringRepresentable {
                 return DataResult.success(t);
             }
         }
-        return DataResult.error("Failed to parse tent type '" + id + "'");
+        return DataResult.error(() -> "Failed to parse tent type '" + id + "'");
     }
 
     @Override

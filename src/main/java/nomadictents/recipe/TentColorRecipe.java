@@ -2,6 +2,7 @@ package nomadictents.recipe;
 
 import com.google.gson.JsonObject;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -89,7 +90,7 @@ public class TentColorRecipe extends ShapedRecipe {
                 sColor = json.get("color").getAsString();
             }
             final DyeColor color = DyeColor.byName(sColor, DyeColor.WHITE);
-            return new TentColorRecipe(recipeId, recipe.getResultItem(), color,
+            return new TentColorRecipe(recipeId, recipe.getResultItem(RegistryAccess.EMPTY), color,
                     recipe.getWidth(), recipe.getHeight(), recipe.getIngredients());
         }
 
@@ -99,7 +100,7 @@ public class TentColorRecipe extends ShapedRecipe {
             ShapedRecipe recipe = super.fromNetwork(recipeId, buffer);
             int iColor = buffer.readInt();
             final DyeColor color = DyeColor.byId(iColor);
-            return new TentColorRecipe(recipeId, recipe.getResultItem(), color,
+            return new TentColorRecipe(recipeId, recipe.getResultItem(RegistryAccess.EMPTY), color,
                     recipe.getWidth(), recipe.getHeight(), recipe.getIngredients());
         }
 

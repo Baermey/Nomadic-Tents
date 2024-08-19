@@ -8,6 +8,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -46,7 +47,7 @@ import java.util.concurrent.Executor;
  */
 public class EmptyChunkGenerator extends ChunkGenerator {
     // we can define the dimension's biome in a json at data/yourmod/worldgen/biome/your_biome
-    public static ResourceKey<Biome> TENT_BIOME = ResourceKey.create(Registry.BIOME_REGISTRY,
+    public static ResourceKey<Biome> TENT_BIOME = ResourceKey.create(Registries.BIOME,
             new ResourceLocation(NomadicTents.MODID, "tent"));
 
     // this Codec will need to be registered to the chunk generator registry in Registry
@@ -54,8 +55,8 @@ public class EmptyChunkGenerator extends ChunkGenerator {
     // (unless and until a forge registry wrapper becomes made for chunk generators)
     public static final Codec<EmptyChunkGenerator> CODEC = RecordCodecBuilder.create(builder -> builder.group(
             // the registry lookup doesn't actually serialize, so we don't need a field for it
-            RegistryOps.retrieveRegistry(Registry.STRUCTURE_SET_REGISTRY).forGetter(EmptyChunkGenerator::getStructureSetRegistry),
-            RegistryOps.retrieveRegistry(Registry.BIOME_REGISTRY).forGetter(EmptyChunkGenerator::getBiomeRegistry)
+            RegistryOps.retrieveRegistry(Registries.STRUCTURE_SET).forGetter(EmptyChunkGenerator::getStructureSetRegistry),
+            RegistryOps.retrieveRegistry(Registries.BIOME).forGetter(EmptyChunkGenerator::getBiomeRegistry)
     ).apply(builder, EmptyChunkGenerator::new));
 
     private final Registry<StructureSet> structures;
@@ -71,8 +72,8 @@ public class EmptyChunkGenerator extends ChunkGenerator {
 
     // create chunk generator at runtime when dynamic dimension is created
     public EmptyChunkGenerator(MinecraftServer server) {
-        this(server.registryAccess().registryOrThrow(Registry.STRUCTURE_SET_REGISTRY),
-                server.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY));
+        this(server.registryAccess().registryOrThrow(Registries.STRUCTURE_SET),
+                server.registryAccess().registryOrThrow(Registries.BIOME));
     }
 
     // create chunk generator when dimension is loaded from the dimension registry on server init
