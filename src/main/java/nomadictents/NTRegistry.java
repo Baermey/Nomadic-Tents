@@ -48,7 +48,6 @@ import nomadictents.tileentity.TentDoorBlockEntity;
 import nomadictents.util.TentSize;
 import nomadictents.util.TentType;
 
-import javax.swing.*;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
